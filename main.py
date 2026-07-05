@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from model import convert, predict
+from model import convert, predict, train
 
 app = FastAPI()
 
@@ -18,6 +18,19 @@ class StockOut(StockIn):
 @app.get("/ping")
 def pong():
     return {"ping": "pong!"}
+
+# ---------- NEW ROUTE ----------
+
+@app.post("/train", status_code=201)
+def train_model(payload: StockIn):
+    ticker = payload.ticker
+
+    train(ticker)
+
+    return {"message": f"Successfully trained model for {ticker}"}
+
+
+# ---------- EXISTING ROUTE ----------
 
 @app.post("/predict", response_model=StockOut, status_code=200)
 def get_prediction(payload: StockIn):
